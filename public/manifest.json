@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "MIRAGE Feasibility Prototype",
+  "version": "1.0",
+  "description": "Stage 1 Validation: Gmail extraction and URL monitoring",
+  "permissions": [
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://mail.google.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
