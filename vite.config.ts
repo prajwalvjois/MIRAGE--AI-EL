@@ -13,7 +13,6 @@ export default defineConfig(() => {
         },
         output: {
           entryFileNames: '[name].js',
-          format: 'iife' // IIFE prevents ES Module strictness errors in Chrome content scripts
         },
       },
     },
