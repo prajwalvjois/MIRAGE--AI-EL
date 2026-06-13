@@ -1,8 +1,8 @@
 import { GmailExtractor } from './providers/email/GmailExtractor';
-import { BackendApiProvider } from './providers/api/BackendApiProvider';
+import { ChromeProvider } from './providers/browser/ChromeProvider';
 
 const extractor = new GmailExtractor();
-const apiProvider = new BackendApiProvider();
+const browserProvider = new ChromeProvider();
 let lastExtractedText: string | null = null;
 
 if (extractor.isTargetPage(window.location.href)) {
@@ -18,8 +18,16 @@ if (extractor.isTargetPage(window.location.href)) {
         console.log(text.substring(0, 150) + "...");
         console.log("------------------------");
         
-        const riskScore = await apiProvider.analyzeEmail(text);
-        console.log(`[MIRAGE] Email Risk Score: ${riskScore}`);
+        console.log("[MIRAGE] Requesting Email Analysis...");
+        try {
+          const riskScore = await browserProvider.sendMessage<number>({
+            type: 'ANALYZE_EMAIL',
+            payload: text
+          });
+          console.log(`[MIRAGE] Email Risk Score: ${riskScore}`);
+        } catch (e) {
+          console.error("[MIRAGE] Error requesting analysis:", e);
+        }
       }
     }
   }, 2000);
