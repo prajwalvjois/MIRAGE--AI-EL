@@ -15,7 +15,7 @@ router = APIRouter()
 
 # Dependency injection for the analyzer
 def get_analyzer() -> IAnalyzer:
-    return AnalyzerFactory.get_analyzer("mock")
+    return AnalyzerFactory.get_analyzer("email_xgboost")
 
 # Dependency injection for the repository
 def get_repository() -> IRepository:

@@ -1,0 +1,23 @@
+EMAIL MODEL FOR MIRAGE
+
+Dataset:
+phishing_email.csv
+
+Samples:
+82486
+
+Features:
+5000 TF-IDF Features
+
+Algorithm:
+XGBoost
+
+Accuracy:
+96.08%
+
+Artifacts:
+models/email_model.pkl
+models/email_features.pkl
+
+Status:
+READY FOR INTEGRATION
