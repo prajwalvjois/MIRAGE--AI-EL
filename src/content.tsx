@@ -107,7 +107,7 @@ const analyzeUrl = async () => {
     });
     if (res.ok) {
       const data = await res.json();
-      const finalRisk = data.final_risk || 0;
+      const finalRisk = data.risk_score ?? 0;
       if (finalRisk >= 0.3) {
         // Inject Warning UI
         const container = document.createElement('div');

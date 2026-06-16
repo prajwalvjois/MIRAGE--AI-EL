@@ -196,7 +196,7 @@ const PopupApp = () => {
           res = await fetch('http://127.0.0.1:8000/analyze-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ body: emailBody })
+            body: JSON.stringify({ email_text: emailBody })
           });
           if (!res.ok) throw new Error(`API error: ${res.status}`);
           riskData = await res.json();
@@ -212,7 +212,7 @@ const PopupApp = () => {
           });
           if (!res.ok) throw new Error(`API error: ${res.status}`);
           riskData = await res.json();
-          finalRisk = riskData.final_risk ?? 0;
+          finalRisk = riskData.risk_score ?? 0;
           r = riskData.reasons ?? [];
         }
         let threatLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';

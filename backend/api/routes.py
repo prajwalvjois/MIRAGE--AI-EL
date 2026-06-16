@@ -105,4 +105,13 @@ async def analyze_url(
             print(f"- {reason}")
         print()
         
-    return RiskScoreResponse(risk_score=risk_score, reasons=analysis_result.reasons)
+    return RiskScoreResponse(
+        risk_score=risk_score, 
+        reasons=analysis_result.reasons,
+        ai_score=analysis_result.ai_score,
+        brand_score=analysis_result.brand_score,
+        context_score=analysis_result.context_score,
+        correlation_score=analysis_result.correlation_score,
+        domain_trust_score=analysis_result.domain_trust_score,
+        reputation_score=analysis_result.reputation_score
+    )
