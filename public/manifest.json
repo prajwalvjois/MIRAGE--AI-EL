@@ -11,14 +11,18 @@
     "*://mail.google.com/*",
     "<all_urls>"
   ],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["*://mail.google.com/*"],
-      "js": ["content.js"]
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["popup.css"]
     }
   ]
 }

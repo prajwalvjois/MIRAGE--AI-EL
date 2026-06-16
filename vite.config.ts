@@ -1,5 +1,7 @@
 import path from 'path';
 import { defineConfig, build } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(() => {
   return {
@@ -9,28 +11,34 @@ export default defineConfig(() => {
       rollupOptions: {
         input: {
           background: path.resolve(__dirname, 'src/background.ts'),
+          popup: path.resolve(__dirname, 'popup.html'),
         },
         output: {
           entryFileNames: '[name].js',
-          format: 'iife'
+          assetFileNames: '[name][extname]',
+          format: 'es'
         },
       },
     },
     plugins: [
+      react(),
+      tailwindcss(),
       {
         name: 'build-content',
         async closeBundle() {
           await build({
             configFile: false,
+            plugins: [react(), tailwindcss()],
             build: {
               outDir: 'dist',
               emptyOutDir: false,
               rollupOptions: {
                 input: {
-                  content: path.resolve(__dirname, 'src/content.ts'),
+                  content: path.resolve(__dirname, 'src/content.tsx'),
                 },
                 output: {
                   entryFileNames: '[name].js',
+                  assetFileNames: 'content-style[extname]',
                   format: 'iife'
                 },
               },
