@@ -6,6 +6,8 @@ from backend.services.url_fusion.weighted_url_risk_fusion_engine import Weighted
 from backend.services.url_orchestrator.url_intelligence_service import UrlIntelligenceService
 from backend.factory.analyzer_factory import AnalyzerFactory
 from backend.factory.brand_extractor_factory import BrandExtractorFactory
+from backend.services.threat_intelligence.static_threat_intelligence_provider import StaticThreatIntelligenceProvider
+from backend.services.threat_intelligence.threat_intelligence_service import ThreatIntelligenceService
 
 class UrlIntelligenceFactory:
     _instance = None
@@ -20,6 +22,9 @@ class UrlIntelligenceFactory:
             correlation_engine = UrlCorrelationEngine()
             fusion_engine = WeightedUrlRiskFusionEngine()
             
+            threat_provider = StaticThreatIntelligenceProvider()
+            threat_service = ThreatIntelligenceService([threat_provider])
+            
             ai_model = AnalyzerFactory.get_analyzer("url_xgboost")
             brand_extractor = BrandExtractorFactory.get_brand_extractor("keyword")
             
@@ -29,6 +34,7 @@ class UrlIntelligenceFactory:
                 brand_analyzer=brand_analyzer,
                 context_analyzer=context_analyzer,
                 correlation_engine=correlation_engine,
-                fusion_engine=fusion_engine
+                fusion_engine=fusion_engine,
+                threat_service=threat_service
             )
         return cls._instance

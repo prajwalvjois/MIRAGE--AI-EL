@@ -5,6 +5,7 @@ from backend.core.interfaces.ibrand_impersonation_analyzer import IBrandImperson
 from backend.core.interfaces.icontext_analyzer import IContextAnalyzer
 from backend.core.interfaces.iurl_correlation_engine import IUrlCorrelationEngine
 from backend.core.interfaces.iurl_risk_fusion_engine import IUrlRiskFusionEngine, UrlRiskAssessment
+from backend.core.interfaces.ithreat_intelligence_service import IThreatIntelligenceService
 
 class UrlIntelligenceService:
     def __init__(self,
@@ -13,15 +14,36 @@ class UrlIntelligenceService:
                  brand_analyzer: IBrandImpersonationAnalyzer,
                  context_analyzer: IContextAnalyzer,
                  correlation_engine: IUrlCorrelationEngine,
-                 fusion_engine: IUrlRiskFusionEngine):
+                 fusion_engine: IUrlRiskFusionEngine,
+                 threat_service: IThreatIntelligenceService):
         self.ai_model = ai_model
         self.brand_extractor = brand_extractor
         self.brand_analyzer = brand_analyzer
         self.context_analyzer = context_analyzer
         self.correlation_engine = correlation_engine
         self.fusion_engine = fusion_engine
+        self.threat_service = threat_service
 
     def analyze(self, url: str) -> UrlRiskAssessment:
+        # 0. Threat Intelligence
+        threat_result = self.threat_service.check_url(url)
+        if threat_result.is_known_malicious:
+            print("[MIRAGE] Threat Intelligence Match:")
+            print(threat_result.matched_domain)
+            print("Source:")
+            print(threat_result.source)
+            print("Risk Forced:")
+            print("1.0")
+
+            return UrlRiskAssessment(
+                ai_score=0.0,
+                brand_score=0.0,
+                context_score=0.0,
+                correlation_score=0.0,
+                final_risk=1.0,
+                reasons=["Known malicious domain"]
+            )
+
         reasons: List[str] = []
 
         # 1. AI Score
@@ -59,5 +81,8 @@ class UrlIntelligenceService:
             correlation_score=correlation_result.correlation_score,
             reasons=reasons
         )
+
+        print(f"[MIRAGE] URL AI Score: {ai_score}")
+        print(f"[MIRAGE] URL Final Risk: {fusion_result.final_risk}")
 
         return fusion_result

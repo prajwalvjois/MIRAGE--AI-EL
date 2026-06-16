@@ -48,7 +48,6 @@ class UrlXGBoostAnalyzer(IAnalyzer):
             # 5. Generate risk score
             risk_score = self.model.predict_proba(X)[0][1]
             
-            print(f"[MIRAGE] URL Risk Score: {risk_score}")
             return float(risk_score)
         except Exception as e:
             print(f"Error analyzing URL: {e}")
