@@ -9,10 +9,11 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
 
     def _get_weights(self) -> dict:
         default_weights = {
-            "ai_score": 0.10,
-            "brand_score": 0.40,
-            "context_score": 0.20,
-            "correlation_score": 0.30
+            "ai_score": 0.09,
+            "brand_score": 0.35,
+            "context_score": 0.17,
+            "correlation_score": 0.26,
+            "domain_trust_score": 0.13
         }
         if not os.path.exists(self.config_path):
             return default_weights
@@ -22,14 +23,15 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
         except Exception:
             return default_weights
 
-    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, reasons: List[str]) -> UrlRiskAssessment:
+    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, domain_trust_score: float, reasons: List[str]) -> UrlRiskAssessment:
         weights = self._get_weights()
         
         final_risk = (
-            (ai_score * weights.get("ai_score", 0.10)) +
-            (brand_score * weights.get("brand_score", 0.40)) +
-            (context_score * weights.get("context_score", 0.20)) +
-            (correlation_score * weights.get("correlation_score", 0.30))
+            (ai_score * weights.get("ai_score", 0.09)) +
+            (brand_score * weights.get("brand_score", 0.35)) +
+            (context_score * weights.get("context_score", 0.17)) +
+            (correlation_score * weights.get("correlation_score", 0.26)) +
+            (domain_trust_score * weights.get("domain_trust_score", 0.13))
         )
 
         return UrlRiskAssessment(
@@ -37,6 +39,7 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
             brand_score=brand_score,
             context_score=context_score,
             correlation_score=correlation_score,
+            domain_trust_score=domain_trust_score,
             final_risk=final_risk,
             reasons=reasons
         )

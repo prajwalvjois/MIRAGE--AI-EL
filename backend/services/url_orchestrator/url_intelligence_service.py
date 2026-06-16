@@ -6,6 +6,7 @@ from backend.core.interfaces.icontext_analyzer import IContextAnalyzer
 from backend.core.interfaces.iurl_correlation_engine import IUrlCorrelationEngine
 from backend.core.interfaces.iurl_risk_fusion_engine import IUrlRiskFusionEngine, UrlRiskAssessment
 from backend.core.interfaces.ithreat_intelligence_service import IThreatIntelligenceService
+from backend.core.interfaces.idomain_trust_analyzer import IDomainTrustAnalyzer
 
 class UrlIntelligenceService:
     def __init__(self,
@@ -15,7 +16,8 @@ class UrlIntelligenceService:
                  context_analyzer: IContextAnalyzer,
                  correlation_engine: IUrlCorrelationEngine,
                  fusion_engine: IUrlRiskFusionEngine,
-                 threat_service: IThreatIntelligenceService):
+                 threat_service: IThreatIntelligenceService,
+                 domain_trust_analyzer: IDomainTrustAnalyzer):
         self.ai_model = ai_model
         self.brand_extractor = brand_extractor
         self.brand_analyzer = brand_analyzer
@@ -23,6 +25,7 @@ class UrlIntelligenceService:
         self.correlation_engine = correlation_engine
         self.fusion_engine = fusion_engine
         self.threat_service = threat_service
+        self.domain_trust_analyzer = domain_trust_analyzer
 
     def analyze(self, url: str) -> UrlRiskAssessment:
         # 0. Threat Intelligence
@@ -40,6 +43,7 @@ class UrlIntelligenceService:
                 brand_score=0.0,
                 context_score=0.0,
                 correlation_score=0.0,
+                domain_trust_score=0.0,
                 final_risk=1.0,
                 reasons=["Known malicious domain"]
             )
@@ -73,12 +77,54 @@ class UrlIntelligenceService:
         for reason in correlation_result.reasons:
             reasons.append(reason)
 
-        # 6. Fusion
+        # 6. Domain Trust
+        trust_result = self.domain_trust_analyzer.analyze_trust(url)
+        for reason in trust_result.reasons:
+            reasons.append(reason)
+            
+        print("")
+        if "Domain trust unavailable" in trust_result.reasons:
+            print("[MIRAGE] WHOIS unavailable")
+            print("")
+            print(f"[MIRAGE] Domain Trust Score: {trust_result.trust_score}")
+            print("")
+            print("Reason:")
+            for reason in trust_result.reasons:
+                print(f"- {reason}")
+        else:
+            print(f"[MIRAGE] Domain Age: {trust_result.domain_age_days} days")
+            print("")
+            print(f"[MIRAGE] Domain Trust Score: {trust_result.trust_score}")
+            print("")
+            print("[MIRAGE] Domain Trust Reasons:")
+            for reason in trust_result.reasons:
+                print(f"- {reason}")
+                
+            from urllib.parse import urlparse
+            domain = urlparse(url).netloc.lower().split(':')[0]
+            if '/' in domain:
+                domain = domain.split('/')[0]
+                
+            info = self.domain_trust_analyzer.provider.get_domain_info(domain)
+            if info:
+                print("")
+                if info.registrar:
+                    print(f"[MIRAGE] Registrar: {info.registrar}")
+                print("")
+                if info.creation_date:
+                    print(f"[MIRAGE] Creation Date: {info.creation_date}")
+                print("")
+                if info.expiration_date:
+                    print(f"[MIRAGE] Expiration Date: {info.expiration_date}")
+        print("")
+
+        # 7. Fusion
         fusion_result = self.fusion_engine.calculate_risk(
             ai_score=ai_score,
             brand_score=brand_result.brand_score,
             context_score=context_result.context_score,
             correlation_score=correlation_result.correlation_score,
+            domain_trust_score=trust_result.trust_score,
             reasons=reasons
         )
 
