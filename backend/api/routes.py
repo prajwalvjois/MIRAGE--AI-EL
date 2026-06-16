@@ -13,9 +13,13 @@ from backend.repository.sqlite_repository import SQLiteRepository
 
 router = APIRouter()
 
-# Dependency injection for the analyzer
-def get_analyzer() -> IAnalyzer:
+# Dependency injection for the email analyzer
+def get_email_analyzer() -> IAnalyzer:
     return AnalyzerFactory.get_analyzer("email_xgboost")
+
+# Dependency injection for the url analyzer
+def get_url_analyzer() -> IAnalyzer:
+    return AnalyzerFactory.get_analyzer("url_xgboost")
 
 # Dependency injection for the repository
 def get_repository() -> IRepository:
@@ -33,7 +37,7 @@ def get_correlation_engine() -> ICorrelationEngine:
 @router.post("/analyze-email", response_model=RiskScoreResponse)
 async def analyze_email(
     request: EmailAnalyzeRequest, 
-    analyzer: IAnalyzer = Depends(get_analyzer),
+    analyzer: IAnalyzer = Depends(get_email_analyzer),
     repository: IRepository = Depends(get_repository),
     brand_extractor: IBrandExtractor = Depends(get_brand_extractor),
     correlation_engine: ICorrelationEngine = Depends(get_correlation_engine)
@@ -68,7 +72,7 @@ async def analyze_email(
 @router.post("/analyze-url", response_model=RiskScoreResponse)
 async def analyze_url(
     request: UrlAnalyzeRequest, 
-    analyzer: IAnalyzer = Depends(get_analyzer),
+    analyzer: IAnalyzer = Depends(get_url_analyzer),
     repository: IRepository = Depends(get_repository),
     brand_extractor: IBrandExtractor = Depends(get_brand_extractor),
     correlation_engine: ICorrelationEngine = Depends(get_correlation_engine)

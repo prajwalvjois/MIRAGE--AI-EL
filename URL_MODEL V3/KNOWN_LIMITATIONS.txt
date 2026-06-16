@@ -1,0 +1,37 @@
+URL MODEL V2 KNOWN LIMITATIONS
+
+This model is trained on lexical URL features and TF-IDF URL tokens.
+
+The model performs well on the PhiUSIIL dataset and achieves:
+
+Accuracy: 99.8176%
+
+However, phishing URLs that rely on brand impersonation may not receive a high phishing probability.
+
+Examples:
+
+paypal-security-login.verify-account.example.com
+
+amazon-security-center.verify-user-login.example.com
+
+account-update-banking-login.example.com
+
+Therefore the MIRAGE architecture must use:
+
+1. ML Model
+2. Rule Engine
+3. Brand Impersonation Detector
+
+The Rule Engine should add risk points for:
+
+- Brand names
+- Login keywords
+- Verify keywords
+- Account keywords
+- Excessive subdomains
+- IP addresses
+- Suspicious TLDs
+- Excessive hyphens
+
+Final verdict should be based on:
+ML Score + Rule Score

@@ -1,0 +1,41 @@
+URL MODEL V2 FOR MIRAGE
+
+Current Architecture:
+- XGBoost
+- 19 Lexical Features
+- 1000 TF-IDF URL Tokens
+- 1019 Total Features
+
+Dataset:
+PhiUSIIL Phishing URL Dataset
+
+Performance:
+Accuracy: 99.8176%
+
+Important:
+
+The ML model alone does not reliably detect brand-impersonation URLs such as:
+
+paypal-security-login.verify-account.example.com
+amazon-security-center.verify-user-login.example.com
+
+These must be handled by the Rule Engine and Brand Impersonation Detector.
+
+Recommended Final Architecture:
+
+URL Analyzer
+=
+ML Model
++
+Rule Engine
++
+Brand Detector
+
+Required model files:
+
+models/url_model.pkl
+models/url_vectorizer.pkl
+models/url_features.pkl
+
+Use verify_model.py to inspect the saved artifacts.
+Use test_urls.py for quick validation.
