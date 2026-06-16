@@ -9,6 +9,7 @@ from backend.core.models.threat_event import ThreatEvent
 from backend.factory.analyzer_factory import AnalyzerFactory
 from backend.factory.brand_extractor_factory import BrandExtractorFactory
 from backend.factory.correlation_engine_factory import CorrelationEngineFactory
+from backend.factory.url_intelligence_factory import UrlIntelligenceFactory
 from backend.repository.sqlite_repository import SQLiteRepository
 
 router = APIRouter()
@@ -17,9 +18,9 @@ router = APIRouter()
 def get_email_analyzer() -> IAnalyzer:
     return AnalyzerFactory.get_analyzer("email_xgboost")
 
-# Dependency injection for the url analyzer
-def get_url_analyzer() -> IAnalyzer:
-    return AnalyzerFactory.get_analyzer("url_xgboost")
+# Dependency injection for the url intelligence service
+def get_url_intelligence_service():
+    return UrlIntelligenceFactory.get_service()
 
 # Dependency injection for the repository
 def get_repository() -> IRepository:
@@ -72,12 +73,14 @@ async def analyze_email(
 @router.post("/analyze-url", response_model=RiskScoreResponse)
 async def analyze_url(
     request: UrlAnalyzeRequest, 
-    analyzer: IAnalyzer = Depends(get_url_analyzer),
+    intelligence_service = Depends(get_url_intelligence_service),
     repository: IRepository = Depends(get_repository),
     brand_extractor: IBrandExtractor = Depends(get_brand_extractor),
     correlation_engine: ICorrelationEngine = Depends(get_correlation_engine)
 ):
-    risk_score = analyzer.analyze_url(request.url)
+    analysis_result = intelligence_service.analyze(request.url)
+    risk_score = analysis_result.final_risk
+    
     brand = brand_extractor.extract_brand(request.url)
     event_id = repository.save_url_event(request.url, brand, risk_score)
     
@@ -102,4 +105,4 @@ async def analyze_url(
             print(f"- {reason}")
         print()
         
-    return RiskScoreResponse(risk_score=risk_score)
+    return RiskScoreResponse(risk_score=risk_score, reasons=analysis_result.reasons)

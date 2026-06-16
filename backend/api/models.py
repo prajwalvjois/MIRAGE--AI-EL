@@ -8,3 +8,4 @@ class UrlAnalyzeRequest(BaseModel):
 
 class RiskScoreResponse(BaseModel):
     risk_score: float
+    reasons: list[str] = []
