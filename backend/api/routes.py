@@ -57,6 +57,7 @@ async def analyze_email(
     recent_events = repository.get_recent_events(limit=100)
     correlation_result = correlation_engine.correlate(current_event, recent_events)
     
+    campaign_resp = None
     if correlation_result:
         print("\n[MIRAGE]")
         print("Campaign Detected")
@@ -68,7 +69,13 @@ async def analyze_email(
             print(f"- {reason}")
         print()
         
-    return RiskScoreResponse(risk_score=risk_score)
+        campaign_resp = {
+            "brand": correlation_result.campaign_brand,
+            "related_events": correlation_result.event_count,
+            "campaign_risk": correlation_result.campaign_risk
+        }
+        
+    return RiskScoreResponse(risk_score=risk_score, campaign=campaign_resp)
 
 @router.post("/analyze-url", response_model=RiskScoreResponse)
 async def analyze_url(
@@ -94,6 +101,7 @@ async def analyze_url(
     recent_events = repository.get_recent_events(limit=100)
     correlation_result = correlation_engine.correlate(current_event, recent_events)
     
+    campaign_resp = None
     if correlation_result:
         print("\n[MIRAGE]")
         print("Campaign Detected")
@@ -105,6 +113,12 @@ async def analyze_url(
             print(f"- {reason}")
         print()
         
+        campaign_resp = {
+            "brand": correlation_result.campaign_brand,
+            "related_events": correlation_result.event_count,
+            "campaign_risk": correlation_result.campaign_risk
+        }
+        
     return RiskScoreResponse(
         risk_score=risk_score, 
         reasons=analysis_result.reasons,
@@ -113,5 +127,6 @@ async def analyze_url(
         context_score=analysis_result.context_score,
         correlation_score=analysis_result.correlation_score,
         domain_trust_score=analysis_result.domain_trust_score,
-        reputation_score=analysis_result.reputation_score
+        reputation_score=analysis_result.reputation_score,
+        campaign=campaign_resp
     )

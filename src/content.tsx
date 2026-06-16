@@ -97,6 +97,19 @@ const WarningApp = ({ finalRisk, reasons }: { finalRisk: number, reasons: string
   return null;
 };
 
+const showWarning = (finalRisk: number, reasons: string[]) => {
+  if (finalRisk >= 0.3) {
+    let container = document.getElementById('mirage-warning-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'mirage-warning-container';
+      document.body.appendChild(container);
+    }
+    const root = createRoot(container);
+    root.render(<WarningApp finalRisk={finalRisk} reasons={reasons} />);
+  }
+};
+
 // URL Analysis logic for all pages
 const analyzeUrl = async () => {
   try {
@@ -108,14 +121,7 @@ const analyzeUrl = async () => {
     if (res.ok) {
       const data = await res.json();
       const finalRisk = data.risk_score ?? 0;
-      if (finalRisk >= 0.3) {
-        // Inject Warning UI
-        const container = document.createElement('div');
-        container.id = 'mirage-warning-container';
-        document.body.appendChild(container);
-        const root = createRoot(container);
-        root.render(<WarningApp finalRisk={finalRisk} reasons={data.reasons || []} />);
-      }
+      showWarning(finalRisk, data.reasons || []);
     }
   } catch (e) {
     console.error("[MIRAGE] Error analyzing URL:", e);
@@ -131,6 +137,8 @@ let lastExtractedText: string | null = null;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'GET_EMAIL_BODY') {
     sendResponse(lastExtractedText);
+  } else if (request.type === 'SHOW_WARNING') {
+    showWarning(request.payload.finalRisk, request.payload.reasons);
   }
 });
 

@@ -256,7 +256,12 @@ const PopupApp = () => {
             domainTrustScore: riskData.domain_trust_score || 0,
             reputationScore: riskData.reputation_score || 0,
             finalRisk: finalRisk
-          }
+          },
+          campaign: riskData.campaign ? {
+            brand: riskData.campaign.brand,
+            relatedEvents: riskData.campaign.related_events,
+            campaignRisk: riskData.campaign.campaign_risk
+          } : undefined
         });
       } catch (err: any) {
         setError(err.message || 'Unknown error');
