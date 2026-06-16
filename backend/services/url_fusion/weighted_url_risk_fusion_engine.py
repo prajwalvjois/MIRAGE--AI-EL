@@ -9,11 +9,12 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
 
     def _get_weights(self) -> dict:
         default_weights = {
-            "ai_score": 0.09,
-            "brand_score": 0.35,
-            "context_score": 0.17,
-            "correlation_score": 0.26,
-            "domain_trust_score": 0.13
+            "ai_score": 0.08,
+            "brand_score": 0.32,
+            "context_score": 0.15,
+            "correlation_score": 0.23,
+            "domain_trust_score": 0.12,
+            "reputation_score": 0.10
         }
         if not os.path.exists(self.config_path):
             return default_weights
@@ -23,15 +24,16 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
         except Exception:
             return default_weights
 
-    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, domain_trust_score: float, reasons: List[str]) -> UrlRiskAssessment:
+    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, domain_trust_score: float, reputation_score: float, reasons: List[str]) -> UrlRiskAssessment:
         weights = self._get_weights()
         
         final_risk = (
-            (ai_score * weights.get("ai_score", 0.09)) +
-            (brand_score * weights.get("brand_score", 0.35)) +
-            (context_score * weights.get("context_score", 0.17)) +
-            (correlation_score * weights.get("correlation_score", 0.26)) +
-            (domain_trust_score * weights.get("domain_trust_score", 0.13))
+            (ai_score * weights.get("ai_score", 0.08)) +
+            (brand_score * weights.get("brand_score", 0.32)) +
+            (context_score * weights.get("context_score", 0.15)) +
+            (correlation_score * weights.get("correlation_score", 0.23)) +
+            (domain_trust_score * weights.get("domain_trust_score", 0.12)) +
+            (reputation_score * weights.get("reputation_score", 0.10))
         )
 
         return UrlRiskAssessment(
@@ -40,6 +42,7 @@ class WeightedUrlRiskFusionEngine(IUrlRiskFusionEngine):
             context_score=context_score,
             correlation_score=correlation_score,
             domain_trust_score=domain_trust_score,
+            reputation_score=reputation_score,
             final_risk=final_risk,
             reasons=reasons
         )

@@ -7,6 +7,7 @@ from backend.core.interfaces.iurl_correlation_engine import IUrlCorrelationEngin
 from backend.core.interfaces.iurl_risk_fusion_engine import IUrlRiskFusionEngine, UrlRiskAssessment
 from backend.core.interfaces.ithreat_intelligence_service import IThreatIntelligenceService
 from backend.core.interfaces.idomain_trust_analyzer import IDomainTrustAnalyzer
+from backend.core.interfaces.ireputation_analyzer import IReputationAnalyzer
 
 class UrlIntelligenceService:
     def __init__(self,
@@ -17,7 +18,8 @@ class UrlIntelligenceService:
                  correlation_engine: IUrlCorrelationEngine,
                  fusion_engine: IUrlRiskFusionEngine,
                  threat_service: IThreatIntelligenceService,
-                 domain_trust_analyzer: IDomainTrustAnalyzer):
+                 domain_trust_analyzer: IDomainTrustAnalyzer,
+                 reputation_analyzer: 'IReputationAnalyzer'):
         self.ai_model = ai_model
         self.brand_extractor = brand_extractor
         self.brand_analyzer = brand_analyzer
@@ -26,6 +28,7 @@ class UrlIntelligenceService:
         self.fusion_engine = fusion_engine
         self.threat_service = threat_service
         self.domain_trust_analyzer = domain_trust_analyzer
+        self.reputation_analyzer = reputation_analyzer
 
     def analyze(self, url: str) -> UrlRiskAssessment:
         # 0. Threat Intelligence
@@ -44,6 +47,7 @@ class UrlIntelligenceService:
                 context_score=0.0,
                 correlation_score=0.0,
                 domain_trust_score=0.0,
+                reputation_score=0.0,
                 final_risk=1.0,
                 reasons=["Known malicious domain"]
             )
@@ -118,13 +122,25 @@ class UrlIntelligenceService:
                     print(f"[MIRAGE] Expiration Date: {info.expiration_date}")
         print("")
 
-        # 7. Fusion
+        # 7. Reputation Analysis
+        rep_result = self.reputation_analyzer.analyze_reputation(url)
+        for reason in rep_result.reasons:
+            reasons.append(reason)
+            
+        print(f"[MIRAGE] Reputation Score: {rep_result.reputation_score}")
+        print("[MIRAGE] Reputation Reasons:")
+        for reason in rep_result.reasons:
+            print(f"- {reason}")
+        print("")
+
+        # 8. Fusion
         fusion_result = self.fusion_engine.calculate_risk(
             ai_score=ai_score,
             brand_score=brand_result.brand_score,
             context_score=context_result.context_score,
             correlation_score=correlation_result.correlation_score,
             domain_trust_score=trust_result.trust_score,
+            reputation_score=rep_result.reputation_score,
             reasons=reasons
         )
 

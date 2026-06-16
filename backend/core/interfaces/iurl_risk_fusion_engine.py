@@ -8,10 +8,11 @@ class UrlRiskAssessment(BaseModel):
     context_score: float
     correlation_score: float
     domain_trust_score: float
+    reputation_score: float
     final_risk: float
     reasons: List[str]
 
 class IUrlRiskFusionEngine(ABC):
     @abstractmethod
-    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, domain_trust_score: float, reasons: List[str]) -> UrlRiskAssessment:
+    def calculate_risk(self, ai_score: float, brand_score: float, context_score: float, correlation_score: float, domain_trust_score: float, reputation_score: float, reasons: List[str]) -> UrlRiskAssessment:
         pass

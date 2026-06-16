@@ -16,6 +16,7 @@ class UrlAnalysisDebugResult:
     context_score: float
     correlation_score: float
     domain_trust_score: float
+    reputation_score: float
     final_risk: float
     reasons: List[str]
 
@@ -59,6 +60,7 @@ def run_validation():
                     context_score=assessment.context_score,
                     correlation_score=assessment.correlation_score,
                     domain_trust_score=assessment.domain_trust_score,
+                    reputation_score=assessment.reputation_score,
                     final_risk=assessment.final_risk,
                     reasons=assessment.reasons
                 )
@@ -148,6 +150,7 @@ def run_validation():
                 f.write(f"Context Score: {r['context_score']:.4f}\n")
                 f.write(f"Correlation Score: {r['correlation_score']:.4f}\n")
                 f.write(f"Domain Trust Score: {r['domain_trust_score']:.4f}\n")
+                f.write(f"Reputation Score: {r['reputation_score']:.4f}\n")
                 f.write(f"Final Risk: {r['final_risk']:.4f}\n")
                 f.write("Reasons:\n")
                 if not r['reasons']:

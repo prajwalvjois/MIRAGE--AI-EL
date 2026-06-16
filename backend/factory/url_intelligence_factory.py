@@ -10,6 +10,8 @@ from backend.services.threat_intelligence.static_threat_intelligence_provider im
 from backend.services.threat_intelligence.threat_intelligence_service import ThreatIntelligenceService
 from backend.services.domain_trust.whois_domain_trust_provider import WhoisDomainTrustProvider
 from backend.services.domain_trust.domain_trust_analyzer import DomainTrustAnalyzer
+from backend.services.reputation.static_reputation_provider import StaticReputationProvider
+from backend.services.reputation.reputation_analyzer import ReputationAnalyzer
 
 class UrlIntelligenceFactory:
     _instance = None
@@ -30,6 +32,9 @@ class UrlIntelligenceFactory:
             whois_provider = WhoisDomainTrustProvider()
             domain_trust_analyzer = DomainTrustAnalyzer(whois_provider)
             
+            reputation_provider = StaticReputationProvider()
+            reputation_analyzer = ReputationAnalyzer([reputation_provider])
+            
             ai_model = AnalyzerFactory.get_analyzer("url_xgboost")
             brand_extractor = BrandExtractorFactory.get_brand_extractor("keyword")
             
@@ -41,6 +46,7 @@ class UrlIntelligenceFactory:
                 correlation_engine=correlation_engine,
                 fusion_engine=fusion_engine,
                 threat_service=threat_service,
-                domain_trust_analyzer=domain_trust_analyzer
+                domain_trust_analyzer=domain_trust_analyzer,
+                reputation_analyzer=reputation_analyzer
             )
         return cls._instance

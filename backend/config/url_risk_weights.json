@@ -1,7 +1,8 @@
 {
-  "ai_score": 0.09,
-  "brand_score": 0.35,
-  "context_score": 0.17,
-  "correlation_score": 0.26,
-  "domain_trust_score": 0.13
+  "ai_score": 0.08,
+  "brand_score": 0.32,
+  "context_score": 0.15,
+  "correlation_score": 0.23,
+  "domain_trust_score": 0.12,
+  "reputation_score": 0.10
 }
