@@ -28,6 +28,8 @@ browserProvider.onUrlChanged(async (tabId, newUrl) => {
             finalRisk,
             reasons: data.reasons || []
           }
+        }).catch(err => {
+          console.log("[MIRAGE] Content script not ready or doesn't exist on this page.");
         });
       }
     }

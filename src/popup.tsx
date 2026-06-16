@@ -96,6 +96,7 @@ const AnalysisBreakdownPanel = ({ breakdown }: { breakdown: Record<string, strin
 };
 
 const CampaignDetectionCard = ({ campaign }: { campaign: any }) => {
+  console.log("[MIRAGE] Campaign Card Rendered, campaign info:", campaign);
   if (!campaign) return null;
   return (
     <div className="mb-4 bg-indigo-50 border border-indigo-100 rounded-lg p-3">
@@ -216,7 +217,7 @@ const PopupApp = () => {
           r = riskData.reasons ?? [];
         }
         let threatLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
-        if (finalRisk >= 1.0 || riskData.reasons?.includes("Known malicious domain")) {
+        if (finalRisk >= 1.0 || riskData.reasons?.some((r: string) => r.toLowerCase().includes("known malicious"))) {
           threatLevel = 'CRITICAL';
         } else if (finalRisk >= 0.7) {
           threatLevel = 'HIGH';

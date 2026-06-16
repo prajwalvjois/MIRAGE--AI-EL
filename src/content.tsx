@@ -5,6 +5,8 @@ import { ChromeProvider } from './providers/browser/ChromeProvider';
 import { AlertTriangle, ShieldAlert, X } from 'lucide-react';
 import './index.css';
 
+console.log("[MIRAGE] Content Script Loaded on:", window.location.href);
+
 const extractor = new GmailExtractor();
 const browserProvider = new ChromeProvider();
 
@@ -76,9 +78,13 @@ const CriticalRiskPage = ({ score, goBack, proceed }: { score: number, goBack: (
 const WarningApp = ({ finalRisk, reasons }: { finalRisk: number, reasons: string[] }) => {
   const [dismissed, setDismissed] = useState(false);
 
+  useEffect(() => {
+    console.log("[MIRAGE] WarningApp Mounted", { finalRisk, reasons });
+  }, [finalRisk, reasons]);
+
   if (dismissed) return null;
 
-  const isCritical = finalRisk >= 1.0 || reasons.includes("Known malicious domain");
+  const isCritical = finalRisk >= 1.0 || reasons.some(r => r.toLowerCase().includes("known malicious"));
   const isHigh = finalRisk >= 0.70 && !isCritical;
   const isMedium = finalRisk >= 0.30 && finalRisk < 0.70;
 
@@ -98,7 +104,9 @@ const WarningApp = ({ finalRisk, reasons }: { finalRisk: number, reasons: string
 };
 
 const showWarning = (finalRisk: number, reasons: string[]) => {
+  console.log("[MIRAGE] showWarning logic triggered, risk:", finalRisk);
   if (finalRisk >= 0.3) {
+    console.log("[MIRAGE] Injecting Warning UI");
     let container = document.getElementById('mirage-warning-container');
     if (!container) {
       container = document.createElement('div');
@@ -135,10 +143,12 @@ analyzeUrl();
 let lastExtractedText: string | null = null;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("[MIRAGE] Message Received in content script:", request.type);
   if (request.type === 'GET_EMAIL_BODY') {
     sendResponse(lastExtractedText);
   } else if (request.type === 'SHOW_WARNING') {
     showWarning(request.payload.finalRisk, request.payload.reasons);
+    sendResponse({ success: true });
   }
 });
 

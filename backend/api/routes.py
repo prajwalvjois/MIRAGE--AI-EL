@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from datetime import datetime
-from backend.api.models import EmailAnalyzeRequest, UrlAnalyzeRequest, RiskScoreResponse
+from backend.api.models import EmailAnalyzeRequest, UrlAnalyzeRequest, RiskScoreResponse, CampaignResponse
 from backend.core.interfaces.ianalyzer import IAnalyzer
 from backend.core.interfaces.irepository import IRepository
 from backend.core.interfaces.ibrand_extractor import IBrandExtractor
@@ -69,11 +69,11 @@ async def analyze_email(
             print(f"- {reason}")
         print()
         
-        campaign_resp = {
-            "brand": correlation_result.campaign_brand,
-            "related_events": correlation_result.event_count,
-            "campaign_risk": correlation_result.campaign_risk
-        }
+        campaign_resp = CampaignResponse(
+            brand=correlation_result.campaign_brand,
+            related_events=correlation_result.event_count,
+            campaign_risk=correlation_result.campaign_risk
+        )
         
     return RiskScoreResponse(risk_score=risk_score, campaign=campaign_resp)
 
@@ -113,11 +113,11 @@ async def analyze_url(
             print(f"- {reason}")
         print()
         
-        campaign_resp = {
-            "brand": correlation_result.campaign_brand,
-            "related_events": correlation_result.event_count,
-            "campaign_risk": correlation_result.campaign_risk
-        }
+        campaign_resp = CampaignResponse(
+            brand=correlation_result.campaign_brand,
+            related_events=correlation_result.event_count,
+            campaign_risk=correlation_result.campaign_risk
+        )
         
     return RiskScoreResponse(
         risk_score=risk_score, 
