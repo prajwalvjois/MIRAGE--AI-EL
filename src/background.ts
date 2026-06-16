@@ -6,7 +6,6 @@ const apiProvider = new BackendApiProvider();
 
 browserProvider.onUrlChanged(async (tabId, newUrl) => {
   console.log(`[MIRAGE] URL Change Detected -> Tab ${tabId}: ${newUrl}`);
-  console.log(`[MIRAGE] Sending URL to backend:`, newUrl);
   const riskScore = await apiProvider.analyzeUrl(newUrl);
   console.log(`[MIRAGE] URL Risk Score for ${newUrl}: ${riskScore}`);
 });

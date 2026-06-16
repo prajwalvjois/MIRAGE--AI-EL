@@ -27,7 +27,6 @@ export class BackendApiProvider implements IApiProvider {
 
   async analyzeUrl(url: string): Promise<number | null> {
     try {
-      console.log("[MIRAGE] URL Endpoint:", `${this.baseUrl}/analyze-url`);
       const response = await fetch(`${this.baseUrl}/analyze-url`, {
         method: 'POST',
         headers: {
