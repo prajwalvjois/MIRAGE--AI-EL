@@ -1,6 +1,7 @@
 from backend.core.interfaces.ianalyzer import IAnalyzer
 from backend.services.analyzers.mock_analyzer import MockAnalyzer
 from backend.services.analyzers.email_xgboost_analyzer import EmailXGBoostAnalyzer
+from backend.services.analyzers.url_xgboost_analyzer import UrlXGBoostAnalyzer
 
 class AnalyzerFactory:
     # Need to keep the initialized components so we only load it once,
@@ -9,6 +10,7 @@ class AnalyzerFactory:
     # If get_analyzer is called per request in FastAPI Depend, it will instantiate a new one!
     # So we should cache it here or in the analyzer.
     _email_xgboost_instance = None
+    _url_xgboost_instance = None
     _mock_instance = None
 
     @classmethod
@@ -21,4 +23,8 @@ class AnalyzerFactory:
             if cls._email_xgboost_instance is None:
                 cls._email_xgboost_instance = EmailXGBoostAnalyzer()
             return cls._email_xgboost_instance
+        elif model_type == "url_xgboost":
+            if cls._url_xgboost_instance is None:
+                cls._url_xgboost_instance = UrlXGBoostAnalyzer()
+            return cls._url_xgboost_instance
         raise ValueError(f"Unknown analyzer type: '{model_type}'")
