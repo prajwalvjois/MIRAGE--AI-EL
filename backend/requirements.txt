@@ -7,3 +7,5 @@ joblib
 pandas
 scipy
 python-whois
+torch
+transformers

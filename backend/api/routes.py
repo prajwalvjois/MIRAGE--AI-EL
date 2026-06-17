@@ -16,7 +16,7 @@ router = APIRouter()
 
 # Dependency injection for the email analyzer
 def get_email_analyzer() -> IAnalyzer:
-    return AnalyzerFactory.get_analyzer("email_xgboost")
+    return AnalyzerFactory.get_analyzer("email_distilbert")
 
 # Dependency injection for the url intelligence service
 def get_url_intelligence_service():
@@ -75,7 +75,15 @@ async def analyze_email(
             campaign_risk=correlation_result.campaign_risk
         )
         
-    return RiskScoreResponse(risk_score=risk_score, campaign=campaign_resp)
+    reasons = []
+    if risk_score >= 0.80:
+        reasons.append("Potential phishing content detected")
+    elif risk_score >= 0.60:
+        reasons.append("Suspicious email language detected")
+    elif risk_score < 0.40:
+        reasons.append("No strong phishing indicators detected")
+        
+    return RiskScoreResponse(risk_score=risk_score, reasons=reasons, campaign=campaign_resp)
 
 @router.post("/analyze-url", response_model=RiskScoreResponse)
 async def analyze_url(
