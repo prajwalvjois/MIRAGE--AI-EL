@@ -248,6 +248,7 @@ const PopupApp = () => {
             reputation: has('low reputation') || has('rare') ? 'WARNING' : 'PASS'
           },
           technicalDetails: isEmail ? {
+            aiScore: riskData.ai_score || 0,
             finalRisk: finalRisk
           } : {
             aiScore: riskData.ai_score || 0,

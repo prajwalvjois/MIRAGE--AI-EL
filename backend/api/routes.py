@@ -83,7 +83,7 @@ async def analyze_email(
     elif risk_score < 0.40:
         reasons.append("No strong phishing indicators detected")
         
-    return RiskScoreResponse(risk_score=risk_score, reasons=reasons, campaign=campaign_resp)
+    return RiskScoreResponse(risk_score=risk_score, ai_score=risk_score, reasons=reasons, campaign=campaign_resp)
 
 @router.post("/analyze-url", response_model=RiskScoreResponse)
 async def analyze_url(
